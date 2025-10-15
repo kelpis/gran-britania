@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController; // 👈 añade esta línea
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AdminMiddleware;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,5 +18,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// 👇 Añade aquí tu ruta de administrador
+
+Route::middleware(['auth', AdminMiddleware::class])
+    ->get('/admin', fn() => 'OK ADMIN DASHBOARD');
+
+// (Puedes dejar tu prueba si quieres)
+//Route::middleware(['auth', 'admin'])->get('/admin-test', fn() => 'solo admin');
 
 require __DIR__.'/auth.php';

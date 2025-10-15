@@ -11,10 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+            Schema::create('services', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->decimal('price', 10, 2)->nullable();
+                $table->string('duration')->nullable();
+                $table->string('level')->nullable();
+                $table->string('modality')->nullable();
+                $table->string('image')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->string('category')->nullable();
+                $table->timestamps();
+            });
     }
 
     /**
