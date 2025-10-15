@@ -21,9 +21,11 @@ Route::middleware('auth')->group(function () {
 
 // 👇 Añade aquí tu ruta de administrador
 
+//Route::middleware(['auth', AdminMiddleware::class])
+    //->get('/admin', fn() => 'OK ADMIN DASHBOARD');
 Route::middleware(['auth', AdminMiddleware::class])
-    ->get('/admin', fn() => 'OK ADMIN DASHBOARD');
-
+    ->get('/admin', [AdminController::class, 'index'])
+    ->name('admin.index');
 // (Puedes dejar tu prueba si quieres)
 //Route::middleware(['auth', 'admin'])->get('/admin-test', fn() => 'solo admin');
 
