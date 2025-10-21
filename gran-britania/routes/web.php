@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminController; // 👈 añade esta línea
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
 
@@ -19,14 +20,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// 👇 Añade aquí tu ruta de administrador
-
-//Route::middleware(['auth', AdminMiddleware::class])
-    //->get('/admin', fn() => 'OK ADMIN DASHBOARD');
+// Rutas del administrador
 Route::middleware(['auth', AdminMiddleware::class])
     ->get('/admin', [AdminController::class, 'index'])
     ->name('admin.index');
-// (Puedes dejar tu prueba si quieres)
-//Route::middleware(['auth', 'admin'])->get('/admin-test', fn() => 'solo admin');
+
+// Rutas del formulario de contacto
+Route::get('/contacto', [ContactController::class, 'create'])->name('contact.create');
+Route::post('/contacto', [ContactController::class, 'store'])->name('contact.store');
 
 require __DIR__.'/auth.php';
