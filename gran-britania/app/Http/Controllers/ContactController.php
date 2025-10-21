@@ -32,9 +32,7 @@ class ContactController extends Controller
             ->notify(new ContactReceived($msg));
             //usleep(1500_000); // 0.7 segundos (ajusta 500-1000 ms si hace falta)
 
-        // 3️⃣ Envía aviso al administrador
-        Notification::route('mail', config('mail.from.address'))
-            ->notify(new ContactAdminAlert($msg));
+    
           
            
 
