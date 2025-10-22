@@ -12,6 +12,7 @@
                         <th class="p-2">Email</th>
                         <th class="p-2">Idiomas</th>
                         <th class="p-2">Urgencia</th>
+                        <th class="p-2">Archivo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -21,7 +22,13 @@
                             <td class="p-2">{{ $tr->name }}</td>
                             <td class="p-2">{{ $tr->email }}</td>
                             <td class="p-2">{{ $tr->source_lang }} → {{ $tr->target_lang }}</td>
-                            <td class="p-2">{{ $tr->urgency }}</td>
+                            <td class="p-2">{{ ucfirst($tr->urgency) }}</td>
+                            <td class="p-2">
+                                <a href="{{ route('admin.translations.download', $tr->id) }}"
+                                    class="text-blue-600 hover:underline">
+                                    Descargar
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
