@@ -23,7 +23,7 @@ class ContactReceived extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             // Copiamos a la admin en BCC. Usa el correo que prefieras aquí:
-            ->cc(env('ADMIN_EMAIL'))
+            //->cc(env('ADMIN_EMAIL'))
             ->subject('Hemos recibido tu mensaje')
             ->greeting('¡Gracias por contactar con Gran Bretania!')
             ->line('Asunto: ' . ($this->msg->subject ?: 'Sin asunto'))
