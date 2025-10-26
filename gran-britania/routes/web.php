@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ClassBookingController;
 use App\Http\Controllers\TranslationRequestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
@@ -32,6 +33,16 @@ Route::middleware(['auth', AdminMiddleware::class])
 // Rutas del formulario de contacto
 Route::get('/contacto', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contacto', [ContactController::class, 'store'])->name('contact.store');
+
+//ROUTAS RESERVA CLASE
+Route::get('/reservar', [ClassBookingController::class, 'create'])
+    ->name('bookings.create');
+
+Route::post('/reservar', [ClassBookingController::class, 'store'])
+    ->name('bookings.store');
+
+Route::get('/reservar/ok', [ClassBookingController::class, 'success'])
+    ->name('bookings.success');
 
 //ROUTAS SOLICITAR TRADUCCION
 Route::get('/traduccion', [TranslationRequestController::class,'create'])->name('translation.create');
