@@ -20,7 +20,15 @@
 
   <div>
     <label class="block text-sm mb-1">Hora*</label>
-    <input type="time" name="class_time" value="{{ old('class_time') }}" class="w-full border rounded p-2" required>
+    <select name="class_time" class="w-full border rounded p-2" required>
+    <option value="">— Selecciona hora —</option>
+    @foreach (range(9, 21) as $h)
+      @php $hh = str_pad($h, 2, '0', STR_PAD_LEFT) . ':00'; @endphp
+      <option value="{{ $hh }}" @selected(old('class_time') === $hh)>
+          {{ $hh }}
+      </option>
+    @endforeach
+  </select>
   </div>
 
   <div>
