@@ -1,0 +1,104 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl">Reservas</h2>
+    </x-slot>
+
+    <div class="py-6 space-y-6 max-w-6xl mx-auto">
+        @if (session('ok'))
+            <div class="p-3 rounded bg-green-50 border border-green-200 text-green-800">{{ session('ok') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="p-3 rounded bg-red-50 border border-red-200 text-red-800">{{ session('error') }}</div>
+        @endif
+
+        {{-- Pendientes --}}
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold mb-3">Pendientes</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="text-left border-b">
+                            <th class="py-2 pr-3">Fecha</th>
+                            <th class="py-2 pr-3">Hora</th>
+                            <th class="py-2 pr-3">Nombre</th>
+                            <th class="py-2 pr-3">Email</th>
+                            <th class="py-2 pr-3">Notas</th>
+                            <th class="py-2">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($pendientes as $b)
+                            <tr class="border-b">
+                                <td class="py-2 pr-3">{{ \Carbon\Carbon::parse($b->class_date)->format('d/m/Y') }}</td>
+                                <td class="py-2 pr-3">{{ substr($b->class_time, 0, 5) }}</td>
+                                <td class="py-2 pr-3">{{ $b->name }}</td>
+                                <td class="py-2 pr-3"><a href="mailto:{{ $b->email }}" class="underline">{{ $b->email }}</a>
+                                </td>
+                                <td class="py-2 pr-3">{{ $b->notes }}</td>
+                                <td class="py-2 flex gap-2">
+                                <td class="py-2 pr-3">
+                                    <div class="flex items-center gap-2">
+                                        {{-- Confirmar --}}
+                                        <form method="POST" action="{{ route('admin.bookings.confirm', $b) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="px-3 py-1 rounded bg-green-600 text-black hover:bg-green-700 border border-green-700">
+                                                Confirmar
+                                            </button>
+                                        </form>
+
+                                        {{--  Cancelar --}}
+                                        <form method="POST" action="{{ route('admin.bookings.cancel', $b) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 border border-red-700">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-3 text-gray-500">No hay reservas pendientes.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Confirmadas (últimas 50) --}}
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold mb-3">Confirmadas (recientes)</h3>
+            <ul class="list-disc pl-6 text-sm">
+                @forelse ($confirmadas as $b)
+                    <li>
+                        {{ \Carbon\Carbon::parse($b->class_date)->format('d/m/Y') }}
+                        {{ substr($b->class_time, 0, 5) }} — {{ $b->name }} ({{ $b->email }})
+                    </li>
+                @empty
+                    <li class="text-gray-500">Sin confirmadas recientes.</li>
+                @endforelse
+            </ul>
+        </div>
+
+        {{-- Canceladas (últimas 50) --}}
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold mb-3">Canceladas (recientes)</h3>
+            <ul class="list-disc pl-6 text-sm">
+                @forelse ($canceladas as $b)
+                    <li>
+                        {{ \Carbon\Carbon::parse($b->class_date)->format('d/m/Y') }}
+                        {{ substr($b->class_time, 0, 5) }} — {{ $b->name }} ({{ $b->email }})
+                    </li>
+                @empty
+                    <li class="text-gray-500">Sin canceladas recientes.</li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
+</x-app-layout>

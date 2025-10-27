@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ClassBookingController;
+use App\Http\Controllers\BookingAdminController;
 use App\Http\Controllers\TranslationRequestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
@@ -44,31 +45,15 @@ Route::post('/reservar', [ClassBookingController::class, 'store'])
 Route::get('/reservar/ok', [ClassBookingController::class, 'success'])
     ->name('bookings.success');
 
-//ROUTAS SOLICITAR TRADUCCION
-Route::get('/traduccion', [TranslationRequestController::class,'create'])->name('translation.create');
-Route::post('/traduccion', [TranslationRequestController::class,'store'])
+//ROUTES SOLICITAR TRADUCCION
+Route::get('/traduccion', [TranslationRequestController::class, 'create'])->name('translation.create');
+Route::post('/traduccion', [TranslationRequestController::class, 'store'])
     ->middleware('throttle:5,1')  // rate limit opcional
     ->name('translation.store');
 
-// Traducciones (panel admin)
-// Admin (agrupado con prefijo y nombres)
-/*Route::middleware(['auth', AdminMiddleware::class])
-    ->prefix('admin')->name('admin.')->group(function () {
+//ROUTES ADMIN 
 
-        // Listado de solicitudes de traducción (VISTA: resources/views/admin/translation.blade.php)
-        Route::get('/traducciones', function () {
-            $items = TranslationRequest::latest()->paginate(20);
-            return view('admin.translation', compact('items'));
-        })->name('translations.index');
-
-        // Descarga del archivo subido por el usuario
-        Route::get('/traducciones/{id}/archivo', function ($id) {
-            $tr = TranslationRequest::findOrFail($id);
-            return response()->download(storage_path('app/' . $tr->file_path));
-        })->name('translations.download');
-    });*/
-
-    Route::middleware(['auth', AdminMiddleware::class])
+Route::middleware(['auth', AdminMiddleware::class])
     ->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/traducciones', function () {
@@ -88,7 +73,12 @@ Route::post('/traduccion', [TranslationRequestController::class,'store'])
             $filename = basename($tr->file_path); // o guarda nombre original en BD
             return Storage::disk('local')->download($tr->file_path, $filename);
         })->name('translations.download');
+
+
+        Route::get('/reservas', [BookingAdminController::class, 'index'])->name('bookings.index');
+        Route::patch('/reservas/{booking}/confirmar', [BookingAdminController::class, 'confirm'])->name('bookings.confirm');
+        Route::patch('/reservas/{booking}/cancelar', [BookingAdminController::class, 'cancel'])->name('bookings.cancel');
     });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
