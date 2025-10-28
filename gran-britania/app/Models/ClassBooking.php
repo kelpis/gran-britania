@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class ClassBooking extends Model
 {
@@ -11,8 +12,15 @@ class ClassBooking extends Model
         'class_time',
         'name',
         'email',
+        'user_id',
         'phone',
         'notes',
         'status'
     ];
+
+    // Relación con el usuario (opcional)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

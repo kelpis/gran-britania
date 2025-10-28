@@ -16,6 +16,10 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('user.bookings.index')" :active="request()->routeIs('user.bookings.*')">
+                        {{ __('Mis reservas') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('contact.create')" :active="request()->routeIs('contact.create')">
                         {{ __('Contacto') }}
                     </x-nav-link>

@@ -6,7 +6,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ClassBookingController;
 use App\Http\Controllers\BookingAdminController;
+use App\Http\Controllers\AvailabilityAdminController;
 use App\Http\Controllers\TranslationRequestController;
+use App\Http\Controllers\UserBookingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\TranslationRequest;
@@ -35,15 +37,29 @@ Route::middleware(['auth', AdminMiddleware::class])
 Route::get('/contacto', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contacto', [ContactController::class, 'store'])->name('contact.store');
 
-//ROUTAS RESERVA CLASE
-Route::get('/reservar', [ClassBookingController::class, 'create'])
-    ->name('bookings.create');
+//ROUTAS RESERVA CLASE (solo usuarios autenticados pueden reservar)
+Route::middleware('auth')->group(function () {
+    Route::get('/reservar', [ClassBookingController::class, 'create'])
+        ->name('bookings.create');
 
-Route::post('/reservar', [ClassBookingController::class, 'store'])
-    ->name('bookings.store');
+    Route::post('/reservar', [ClassBookingController::class, 'store'])
+        ->name('bookings.store');
+    
+    // Endpoint para consultar horas disponibles para una fecha
+    Route::get('/reservar/disponibilidad', [ClassBookingController::class, 'availability'])
+        ->name('bookings.availability');
+});
 
 Route::get('/reservar/ok', [ClassBookingController::class, 'success'])
     ->name('bookings.success');
+
+// Panel de usuario: mis reservas (loggeados)
+Route::middleware('auth')->group(function () {
+    Route::get('/mis-reservas', [UserBookingController::class, 'index'])->name('user.bookings.index');
+    Route::get('/mis-reservas/{booking}/editar', [UserBookingController::class, 'edit'])->name('user.bookings.edit');
+    Route::put('/mis-reservas/{booking}', [UserBookingController::class, 'update'])->name('user.bookings.update');
+    Route::delete('/mis-reservas/{booking}', [UserBookingController::class, 'destroy'])->name('user.bookings.destroy');
+});
 
 //ROUTES SOLICITAR TRADUCCION
 Route::get('/traduccion', [TranslationRequestController::class, 'create'])->name('translation.create');
@@ -78,6 +94,12 @@ Route::middleware(['auth', AdminMiddleware::class])
         Route::get('/reservas', [BookingAdminController::class, 'index'])->name('bookings.index');
         Route::patch('/reservas/{booking}/confirmar', [BookingAdminController::class, 'confirm'])->name('bookings.confirm');
         Route::patch('/reservas/{booking}/cancelar', [BookingAdminController::class, 'cancel'])->name('bookings.cancel');
+        //ROUTE FRANJAS HORARIAS
+        Route::get('/disponibilidad', [AvailabilityAdminController::class, 'index'])->name('availability.index');
+        Route::post('/disponibilidad', [AvailabilityAdminController::class, 'store'])->name('availability.store');
+        Route::post('/disponibilidad/generar', [AvailabilityAdminController::class, 'generate'])->name('availability.generate');
+        Route::patch('/disponibilidad/{slot}/toggle', [AvailabilityAdminController::class, 'toggle'])->name('availability.toggle');
+        Route::delete('/disponibilidad/{slot}', [AvailabilityAdminController::class, 'destroy'])->name('availability.destroy');
     });
 
 
