@@ -47,21 +47,52 @@ class AvailabilityAdminController extends Controller
     // Generador en lote (laborables, por rango de fechas y horas)
     public function generate(Request $request)
     {
+        // Validación básica de fechas y estado. Las horas se validan más abajo
+        // dependiendo de si se está generando franjas horarias o bloqueando días completos.
         $request->validate([
             'from_date' => ['required','date','after_or_equal:today'],
             'to_date'   => ['required','date','after_or_equal:from_date'],
-            'start_hour'=> ['required','integer','between:0,23'],
-            'end_hour'  => ['required','integer','between:1,24','gt:start_hour'],
             'status'    => ['required','in:available,blocked'],
-            'weekends'  => ['nullable','boolean'], // si marcas true, también fines de semana
+            'full_day'  => ['nullable','boolean'], // si true -> bloquea días enteros (00:00-24:00)
         ]);
 
-        $from = \Carbon\Carbon::parse($request->from_date);
-        $to   = \Carbon\Carbon::parse($request->to_date);
+    $from = \Carbon\Carbon::parse($request->from_date);
+    $to   = \Carbon\Carbon::parse($request->to_date);
         $count = 0;
+        $created = [];
+
+    // Si no se envían horas, asumimos bloqueo de días completos.
+    $isFullDay = $request->boolean('full_day') || !$request->has('start_hour');
+
+        // Validación de horas sólo si no pedimos días completos
+        if (!$isFullDay) {
+            $request->validate([
+                'start_hour'=> ['required','integer','between:0,23'],
+                'end_hour'  => ['required','integer','between:1,24'],
+            ]);
+
+            if ((int)$request->end_hour <= (int)$request->start_hour) {
+                return back()->with('error','La hora de fin debe ser mayor que la hora de inicio.');
+            }
+        }
 
         for ($date = $from->copy(); $date->lte($to); $date->addDay()) {
-            if (!$request->boolean('weekends') && $date->isWeekend()) continue;
+            // Excluir fines de semana siempre (validación centralizada en requests / reglas de negocio)
+            if ($date->isWeekend()) continue;
+
+            if ($isFullDay) {
+                // Crear una franja que cubra todo el día
+                $start = '00:00';
+                $end = '24:00';
+
+                AvailabilitySlot::updateOrCreate(
+                    ['date'=>$date->toDateString(),'start_time'=>$start,'end_time'=>$end],
+                    ['status'=>$request->status]
+                );
+                $count++;
+                $created[] = $date->toDateString() . ' ' . $start . '-' . $end;
+                continue;
+            }
 
             for ($h = (int)$request->start_hour; $h < (int)$request->end_hour; $h++) {
                 $start = sprintf('%02d:00', $h);
@@ -72,10 +103,12 @@ class AvailabilityAdminController extends Controller
                     ['status'=>$request->status]
                 );
                 $count++;
+                $created[] = $date->toDateString() . ' ' . $start . '-' . $end;
             }
         }
 
-        return back()->with('ok', "Generadas/actualizadas {$count} franjas.");
+        // Devolvemos en la sesión el detalle de las franjas creadas para depuración en UI.
+        return back()->with('ok', "Generadas/actualizadas {$count} franjas.")->with('generated', $created);
     }
 
     // Toggle rápido available/blocked

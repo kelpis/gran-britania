@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassBooking;
+use App\Models\TranslationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
@@ -10,6 +11,7 @@ use App\Notifications\BookingUpdatedNotification;
 use App\Notifications\BookingAdminUpdatedNotification;
 use App\Notifications\BookingCancelledNotification;
 use App\Notifications\BookingAdminCancelledNotification;
+use App\Models\AvailabilitySlot;
 
 class UserBookingController extends Controller
 {
@@ -27,7 +29,12 @@ class UserBookingController extends Controller
             ->orderBy('class_time', 'desc')
             ->get();
 
-        return view('user.bookings.index', compact('bookings'));
+        // Obtener solicitudes de traducción asociadas al email del usuario
+        $translations = TranslationRequest::where('email', $user->email)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('user.bookings.index', compact('bookings', 'translations'));
     }
 
     // Formulario para editar una reserva (si le pertenece)
@@ -60,6 +67,26 @@ class UserBookingController extends Controller
 
         if ($conflict) {
             return back()->withErrors(['class_time' => 'Esa franja ya está ocupada.'])->withInput();
+        }
+
+        // Comprobar si la franja está bloqueada por admin
+        $isBlocked = AvailabilitySlot::where('date', $data['class_date'])
+            ->where('status', 'blocked')
+            ->get()
+            ->filter(function ($slot) use ($data) {
+                [$h, $m] = explode(':', substr($data['class_time'], 0, 5));
+                $tMin = intval($h) * 60 + intval($m);
+
+                [$sH, $sM] = explode(':', substr($slot->start_time, 0, 5));
+                [$eH, $eM] = explode(':', substr($slot->end_time, 0, 5));
+                $sMin = intval($sH) * 60 + intval($sM);
+                $eMin = intval($eH) * 60 + intval($eM);
+
+                return $tMin >= $sMin && $tMin < $eMin;
+            })->isNotEmpty();
+
+        if ($isBlocked) {
+            return back()->withErrors(['class_time' => 'Esa franja está bloqueada por el administrador.'])->withInput();
         }
 
         $booking->update($data);

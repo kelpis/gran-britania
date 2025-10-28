@@ -47,4 +47,6 @@
             @endif
         </div>
     </div>
+    
+    {{-- Las traducciones ahora tienen su propia página en /mis-traducciones --}}
 </x-app-layout>

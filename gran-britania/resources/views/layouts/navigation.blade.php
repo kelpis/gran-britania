@@ -20,6 +20,12 @@
                         {{ __('Mis reservas') }}
                     </x-nav-link>
 
+                    @auth
+                        <x-nav-link :href="route('user.translations.index')" :active="request()->routeIs('user.translations.*')">
+                            {{ __('Mis traducciones') }}
+                        </x-nav-link>
+                    @endauth
+
                     <x-nav-link :href="route('contact.create')" :active="request()->routeIs('contact.create')">
                         {{ __('Contacto') }}
                     </x-nav-link>
@@ -83,6 +89,16 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @auth
+                <x-responsive-nav-link :href="route('user.bookings.index')" :active="request()->routeIs('user.bookings.*')">
+                    {{ __('Mis reservas') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('user.translations.index')" :active="request()->routeIs('user.translations.*')">
+                    {{ __('Mis traducciones') }}
+                </x-responsive-nav-link>
+            @endauth
 
             <x-responsive-nav-link :href="route('contact.create')" :active="request()->routeIs('contact.create')">
                 {{ __('Contacto') }}

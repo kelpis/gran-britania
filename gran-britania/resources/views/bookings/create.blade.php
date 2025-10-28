@@ -27,7 +27,11 @@
       {{-- Fecha y hora --}}
       <div>
         <label class="block text-sm font-medium mb-1">Fecha*</label>
-        <input type="date" name="class_date" class="w-full border rounded p-2" value="{{ old('class_date') }}" min="{{ now()->toDateString() }}" required>
+        <select id="class_date" name="class_date" class="w-full border rounded p-2" required aria-describedby="date-help">
+          <option value="">— Selecciona fecha —</option>
+          {{-- JS rellenará las próximas fechas (excluyendo fines de semana) --}}
+        </select>
+        <p id="date-help" class="text-sm text-gray-500 mt-1">Solo días laborables (L–V). Los fines de semana no están disponibles.</p>
         @error('class_date')
           <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
         @enderror
@@ -94,12 +98,38 @@
       </div>
     </form>
   </div>
-  <script>
+      <script>
     (function(){
-      const dateInput = document.querySelector('input[name="class_date"]');
+      const dateSelect = document.getElementById('class_date');
       const timeSelect = document.getElementById('class_time');
       const help = document.getElementById('time-help');
       const url = '{{ route('bookings.availability') }}';
+
+      // Generar próximas N fechas (excluyendo fines de semana)
+      function pad(n){ return n < 10 ? '0'+n : n }
+      function formatYMD(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+      function formatDisplay(d){ return pad(d.getDate()) + '/' + pad(d.getMonth()+1) + '/' + d.getFullYear(); }
+
+      const DAYS = 30; // buscar 30 días hacia adelante
+      const oldDate = '{{ old('class_date') }}';
+
+      (function populateDates(){
+        const today = new Date();
+        for (let i = 0, added = 0; added < DAYS; i++) {
+          const d = new Date(today);
+          d.setDate(today.getDate() + i);
+          const dow = d.getDay(); // 0 = dom, 6 = sab
+          if (dow === 0 || dow === 6) continue; // saltar fines de semana
+
+          const val = formatYMD(d);
+          const opt = document.createElement('option');
+          opt.value = val;
+          opt.textContent = formatDisplay(d) + ' (' + ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][dow] + ')';
+          if (oldDate === val) opt.selected = true;
+          dateSelect.appendChild(opt);
+          added++;
+        }
+      })();
 
       async function loadTimesFor(date) {
         if (!date) return;
@@ -127,9 +157,9 @@
         }
       }
 
-      dateInput.addEventListener('change', function(){ loadTimesFor(this.value); });
+      dateSelect.addEventListener('change', function(){ loadTimesFor(this.value); });
       // load on page load if date present
-      if (dateInput.value) loadTimesFor(dateInput.value);
+      if (dateSelect.value) loadTimesFor(dateSelect.value);
     })();
   </script>
 </x-app-layout>

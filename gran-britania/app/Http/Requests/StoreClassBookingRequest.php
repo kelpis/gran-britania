@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Models\ClassBooking;
 use Illuminate\Contracts\Validation\Validator;
+use Carbon\Carbon;
 
 class StoreClassBookingRequest extends FormRequest
 {
@@ -43,6 +44,17 @@ class StoreClassBookingRequest extends FormRequest
             if ($exists) {
                 $validator->errors()->add('class_time', 'Lo sentimos — esa franja ya está ocupada.');
             }
+
+            // Validación: no permitir fines de semana
+            try {
+                $dt = Carbon::parse($data['class_date']);
+                $dow = $dt->dayOfWeek; // 0 = domingo, 6 = sábado
+                if ($dow === Carbon::SATURDAY || $dow === Carbon::SUNDAY) {
+                    $validator->errors()->add('class_date', 'No es posible reservar en fines de semana. Por favor elige un día laborable.');
+                }
+            } catch (\Throwable $e) {
+                // si no se puede parsear, dejar que la regla 'date' reporte el error
+            }
         });
     }
 
@@ -51,6 +63,8 @@ class StoreClassBookingRequest extends FormRequest
         return [
             'availability_slot_id.required' => 'Selecciona una franja disponible.',
             'availability_slot_id.exists'   => 'La franja no está disponible o incumple las reglas (L–V, 09:00–21:00).',
+            'class_date.required' => 'Selecciona una fecha válida.',
+            'class_date.date' => 'La fecha no tiene un formato válido.',
         ];
     }
 }

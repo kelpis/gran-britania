@@ -59,6 +59,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/mis-reservas/{booking}/editar', [UserBookingController::class, 'edit'])->name('user.bookings.edit');
     Route::put('/mis-reservas/{booking}', [UserBookingController::class, 'update'])->name('user.bookings.update');
     Route::delete('/mis-reservas/{booking}', [UserBookingController::class, 'destroy'])->name('user.bookings.destroy');
+
+    // Permitir al usuario descargar su propio archivo de traducción (si subió uno)
+    Route::get('/mis-traducciones/{id}/archivo', function ($id) {
+        $tr = TranslationRequest::findOrFail($id);
+
+        // Asegurar que la traducción pertenece al usuario loggeado
+        if ($tr->email !== auth()->user()->email) {
+            abort(403);
+        }
+
+        if (!Storage::disk('local')->exists($tr->file_path)) {
+            abort(404, 'Archivo no encontrado en el servidor.');
+        }
+
+        $filename = basename($tr->file_path);
+        return Storage::disk('local')->download($tr->file_path, $filename);
+    })->name('user.translations.download');
+
+    // Página dedicada: Mis traducciones (lista del usuario)
+    Route::get('/mis-traducciones', function () {
+        $user = auth()->user();
+        $items = TranslationRequest::where('email', $user->email)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('user.translations.index', compact('items'));
+    })->name('user.translations.index');
 });
 
 //ROUTES SOLICITAR TRADUCCION

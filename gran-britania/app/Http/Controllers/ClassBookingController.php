@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreClassBookingRequest;
 use App\Models\ClassBooking;
+use App\Models\AvailabilitySlot;
 use App\Notifications\BookingReceived;
 use App\Notifications\BookingAdminNotification;
 use Illuminate\Support\Facades\Log;
@@ -38,6 +39,27 @@ class ClassBookingController extends Controller
         }
 
         // 3) Crear en pending
+        // Antes de crear, comprobar que la franja no esté bloqueada por admin
+        $isBlocked = AvailabilitySlot::where('date', $data['class_date'])
+            ->where('status', 'blocked')
+            ->get()
+            ->filter(function ($slot) use ($data) {
+                // convertir tiempos a minutos para comparar rangos
+                [$h, $m] = explode(':', substr($data['class_time'], 0, 5));
+                $tMin = intval($h) * 60 + intval($m);
+
+                [$sH, $sM] = explode(':', substr($slot->start_time, 0, 5));
+                [$eH, $eM] = explode(':', substr($slot->end_time, 0, 5));
+                $sMin = intval($sH) * 60 + intval($sM);
+                // soportar end_time == '24:00'
+                $eMin = intval($eH) * 60 + intval($eM);
+
+                return $tMin >= $sMin && $tMin < $eMin;
+            })->isNotEmpty();
+
+        if ($isBlocked) {
+            return back()->withErrors(['class_time' => 'Esa franja está bloqueada por el administrador.'])->withInput();
+        }
         $payload = [
             'class_date' => $data['class_date'],
             'class_time' => $data['class_time'],
@@ -108,8 +130,32 @@ class ClassBookingController extends Controller
             return substr($b->class_time, 0, 5);
         })->toArray();
 
-        $available = array_values(array_filter($all, function ($t) use ($taken) {
-            return ! in_array($t, $taken);
+        // Excluir franjas bloqueadas por admin
+        $blockedSlots = AvailabilitySlot::where('date', $date)
+            ->where('status', 'blocked')
+            ->get();
+
+        // Convertir a minutos para comparar
+        $toMinutes = function ($time) {
+            [$H, $M] = explode(':', substr($time, 0, 5));
+            return intval($H) * 60 + intval($M);
+        };
+
+        $blockedTimes = [];
+        foreach ($all as $t) {
+            $tMin = $toMinutes($t);
+            foreach ($blockedSlots as $slot) {
+                $sMin = $toMinutes($slot->start_time);
+                $eMin = $toMinutes($slot->end_time);
+                if ($tMin >= $sMin && $tMin < $eMin) {
+                    $blockedTimes[] = $t;
+                    break;
+                }
+            }
+        }
+
+        $available = array_values(array_filter($all, function ($t) use ($taken, $blockedTimes) {
+            return ! in_array($t, $taken) && ! in_array($t, $blockedTimes);
         }));
 
         return response()->json(['available' => $available]);
