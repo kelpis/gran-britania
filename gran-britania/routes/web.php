@@ -22,6 +22,8 @@ Route::get('/', function () {
 Route::get('/servicios', [App\Http\Controllers\ServiceController::class, 'index'])->name('services.index');
 // Política de protección de datos (página pública)
 Route::view('/politica-privacidad', 'legal.privacy')->name('privacy');
+// Política de cookies (página pública)
+Route::view('/cookies', 'legal.cookies')->name('cookies.policy');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
