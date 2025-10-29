@@ -51,10 +51,13 @@
                                         <form method="POST" action="{{ route('admin.bookings.confirm', $b) }}">
                                             @csrf
                                             @method('PATCH')
-                        <button type="submit"
-                            class="px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                Confirmar
-                                            </button>
+                        <div class="flex items-center gap-2">
+                            <input name="meeting_url" type="url" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="{{ $b->meeting_url ?? '' }}" class="px-2 py-1 border rounded text-sm w-64" aria-label="URL videollamada" />
+                            <button type="submit"
+                                class="px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Confirmar
+                            </button>
+                        </div>
                                         </form>
 
                                         {{-- Cancelar --}}
@@ -85,11 +88,14 @@
         {{-- Confirmadas (últimas 50) --}}
         <div class="bg-white p-4 rounded shadow">
             <h3 class="font-semibold mb-3">Confirmadas (recientes)</h3>
-            <ul class="list-disc pl-6 text-sm">
+                <ul class="list-disc pl-6 text-sm">
                 @forelse ($confirmadas as $b)
-                    <li>
+                    <li class="mb-1">
                         {{ \Carbon\Carbon::parse($b->class_date)->format('d/m/Y') }}
                         {{ substr($b->class_time, 0, 5) }} — {{ $b->name }} ({{ $b->email }})
+                        @if(!empty($b->meeting_url))
+                            — <a href="{{ route('bookings.join', $b) }}" target="_blank" class="text-blue-600 underline">Unirse</a>
+                        @endif
                     </li>
                 @empty
                     <li class="text-gray-500">Sin confirmadas recientes.</li>

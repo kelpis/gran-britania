@@ -17,7 +17,13 @@ class ClassBooking extends Model
         'notes',
         'status',
         'gdpr_given',
-        'gdpr_at'
+        'gdpr_at',
+        'meeting_url',
+    ];
+
+    protected $casts = [
+        'gdpr_given' => 'boolean',
+        'gdpr_at' => 'datetime',
     ];
 
     // Relación con el usuario (opcional)

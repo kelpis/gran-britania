@@ -7,6 +7,7 @@ use App\Models\ClassBooking;
 use App\Models\AvailabilitySlot;
 use App\Notifications\BookingReceived;
 use App\Notifications\BookingAdminNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\Request;
@@ -71,8 +72,8 @@ class ClassBookingController extends Controller
         ];
 
         // Asignar user_id si hay usuario autenticado
-        if (auth()->check()) {
-            $payload['user_id'] = auth()->id();
+        if (Auth::check()) {
+            $payload['user_id'] = Auth::id();
         }
 
         // Mapear consentimiento GDPR si viene en el request
@@ -165,5 +166,32 @@ class ClassBookingController extends Controller
         }));
 
         return response()->json(['available' => $available]);
+    }
+
+    /**
+     * Permite unirse a la videollamada de una reserva.
+     * Puede accederse si la URL firmada es válida o si el usuario autenticado
+     * es el propietario de la reserva o un admin.
+     */
+    public function join(Request $request, ClassBooking $booking)
+    {
+        // Permitir si la petición tiene firma válida
+        if ($request->hasValidSignature()) {
+            $url = $booking->meeting_url ?? null;
+            return redirect()->away($url ?: url('/'));
+        }
+
+        // Si no, permitir a usuarios autenticados que sean admin o dueños
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->is_admin || $user->email === $booking->email || $user->id === $booking->user_id) {
+                if (! empty($booking->meeting_url)) {
+                    return redirect()->away($booking->meeting_url);
+                }
+                abort(404, 'No hay enlace de videollamada asociado a esta reserva.');
+            }
+        }
+
+        abort(403);
     }
 }

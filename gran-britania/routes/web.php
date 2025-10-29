@@ -58,6 +58,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/reservar/ok', [ClassBookingController::class, 'success'])
     ->name('bookings.success');
 
+// Ruta para unirse a la videollamada asociada a una reserva
+Route::get('/reservas/{booking}/unirse', [App\Http\Controllers\ClassBookingController::class, 'join'])
+    ->name('bookings.join');
+
 // Panel de usuario: mis reservas (loggeados)
 Route::middleware('auth')->group(function () {
     Route::get('/mis-reservas', [UserBookingController::class, 'index'])->name('user.bookings.index');

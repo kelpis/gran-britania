@@ -40,7 +40,16 @@ class BookingAdminController extends Controller
             return back()->with('error','Ya hay otra reserva confirmada en esa franja.');
         }
 
-        $booking->update(['status' => 'confirmed']);
+        // Permitir que el admin incluya la URL de la videollamada al confirmar
+        $data = ['status' => 'confirmed'];
+        if (request()->filled('meeting_url')) {
+            $data['meeting_url'] = request()->input('meeting_url');
+        }
+
+        $booking->update($data);
+
+        // Asegurarnos de refrescar el modelo para que contenga meeting_url actualizado
+        $booking->refresh();
 
         try {
             Notification::route('mail', $booking->email)

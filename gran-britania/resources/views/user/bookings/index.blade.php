@@ -37,6 +37,10 @@
                                                 @method('DELETE')
                                                 <button class="text-red-600" onclick="return confirm('¿Cancelar reserva?')">Cancelar</button>
                                             </form>
+
+                                            @if($b->status === 'confirmed' && !empty($b->meeting_url))
+                                                <a href="{{ route('bookings.join', $b) }}" class="ml-2 text-green-600 underline" target="_blank">Unirse</a>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
