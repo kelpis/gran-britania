@@ -91,6 +91,13 @@
       </div>
 
       {{-- Botón --}}
+      <div>
+        <label class="inline-flex items-center text-sm">
+          <input type="checkbox" name="gdpr" value="1" required class="border">
+          <span class="ml-2">He leído y acepto la <a href="{{ route('privacy') }}" class="text-blue-600 underline">política de protección de datos</a>.</span>
+        </label>
+      </div>
+
       <div class="text-center">
         <button type="submit" class="px-5 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700">
           Enviar reserva

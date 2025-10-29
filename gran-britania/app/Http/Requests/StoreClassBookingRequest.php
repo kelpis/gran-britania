@@ -24,6 +24,7 @@ class StoreClassBookingRequest extends FormRequest
             'email'      => ['required', 'email'],
             'phone'      => ['nullable', 'string', 'max:40'],
             'notes'      => ['nullable', 'string', 'max:255'],
+            'gdpr'       => ['accepted'],
         ];
     }
 

@@ -75,6 +75,12 @@ class ClassBookingController extends Controller
             $payload['user_id'] = auth()->id();
         }
 
+        // Mapear consentimiento GDPR si viene en el request
+        if (isset($data['gdpr']) && $data['gdpr']) {
+            $payload['gdpr_given'] = true;
+            $payload['gdpr_at'] = now();
+        }
+
         $booking = ClassBooking::create($payload);
 
         // 4) Notificaciones (usuario + admin)

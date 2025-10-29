@@ -22,9 +22,15 @@ class TranslationRequestController extends Controller
     {
         $path = $request->file('file')->store('translations');
 
-        $tr = TranslationRequest::create(
-            $request->safe()->except('file') + ['file_path' => $path]
-        );
+        $data = $request->safe()->except('file');
+        // Mapear consentimiento GDPR
+        if (isset($data['gdpr']) && $data['gdpr']) {
+            $data['gdpr_given'] = true;
+            $data['gdpr_at'] = now();
+            unset($data['gdpr']);
+        }
+
+        $tr = TranslationRequest::create(array_merge($data, ['file_path' => $path]));
 
         // correo al usuario
         Notification::route('mail', $tr->email)

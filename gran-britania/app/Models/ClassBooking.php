@@ -15,7 +15,9 @@ class ClassBooking extends Model
         'user_id',
         'phone',
         'notes',
-        'status'
+        'status',
+        'gdpr_given',
+        'gdpr_at'
     ];
 
     // Relación con el usuario (opcional)

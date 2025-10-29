@@ -25,7 +25,17 @@ class ContactController extends Controller
     public function store(StoreContactRequest $request)
     {
         // 1️⃣ Guarda el mensaje en base de datos
-        $msg = ContactMessage::create($request->validated());
+        $data = $request->validated();
+
+        // Mapear el checkbox 'gdpr' (aceptado) a los campos persistidos
+        if (isset($data['gdpr']) && $data['gdpr']) {
+            $data['gdpr_given'] = true;
+            $data['gdpr_at'] = now();
+            // Remove the raw 'gdpr' input so it doesn't cause mass-assignment issues
+            unset($data['gdpr']);
+        }
+
+        $msg = ContactMessage::create($data);
 
         // 2️⃣ Envía un acuse al usuario
         Notification::route('mail', $msg->email)

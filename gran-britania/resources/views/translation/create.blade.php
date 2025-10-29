@@ -60,6 +60,13 @@
             <textarea name="comments" rows="4" class="w-full border rounded p-2">{{ old('comments') }}</textarea>
           </div>
 
+          <div class="flex items-start gap-3">
+            <label class="inline-flex items-center text-sm">
+              <input type="checkbox" name="gdpr" value="1" required class="border">
+              <span class="ml-2">He leído y acepto la <a href="{{ route('privacy') }}" class="text-blue-600 underline">política de protección de datos</a>.</span>
+            </label>
+          </div>
+
           <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Enviar</button>
         </form>
       </div>

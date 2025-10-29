@@ -26,6 +26,7 @@ class StoreContactRequest extends FormRequest
             'email'   => 'required|email',
             'subject' => 'nullable|string|max:160',
             'message' => 'required|string|max:2000',
+            'gdpr'    => 'accepted',
             // Si luego añades reCAPTCHA:
             // 'g-recaptcha-response' => 'required|recaptcha'
         ];
@@ -37,6 +38,7 @@ class StoreContactRequest extends FormRequest
             'name.required' => 'Por favor indica tu nombre.',
             'email.required' => 'Por favor indica un correo válido.',
             'message.required' => 'Escribe tu mensaje antes de enviarlo.',
+            'gdpr.accepted' => 'Debes aceptar la política de protección de datos para continuar.',
         ];
     }
 }

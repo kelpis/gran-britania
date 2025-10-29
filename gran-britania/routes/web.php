@@ -18,6 +18,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Página pública de servicios (clases online y traducciones)
+Route::get('/servicios', [App\Http\Controllers\ServiceController::class, 'index'])->name('services.index');
+// Política de protección de datos (página pública)
+Route::view('/politica-privacidad', 'legal.privacy')->name('privacy');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

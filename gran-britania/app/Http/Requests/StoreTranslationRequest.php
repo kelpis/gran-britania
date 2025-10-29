@@ -29,6 +29,7 @@ class StoreTranslationRequest extends FormRequest
             'urgency' => 'nullable|in:normal,alta',
             'file' => 'required|file|max:5120', // 5MB
             'comments' => 'nullable|string|max:2000',
+            'gdpr' => 'accepted',
         ];
     }
 }
