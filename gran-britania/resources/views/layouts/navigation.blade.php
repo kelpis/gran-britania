@@ -16,23 +16,24 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('user.bookings.index')" :active="request()->routeIs('user.bookings.*')">
+                    <x-nav-link :href="(auth()->check() && auth()->user()->is_admin) ? route('admin.bookings.index') : route('user.bookings.index')" :active="request()->routeIs('user.bookings.*') || request()->routeIs('admin.bookings.*')">
                         {{ __('Mis reservas') }}
                     </x-nav-link>
 
                     @auth
-                        <x-nav-link :href="route('user.translations.index')" :active="request()->routeIs('user.translations.*')">
+                        <x-nav-link :href="(auth()->user()->is_admin) ? route('admin.translations.index') : route('user.translations.index')" :active="request()->routeIs('user.translations.*') || request()->routeIs('admin.translations.*')">
                             {{ __('Mis traducciones') }}
                         </x-nav-link>
                     @endauth
 
-                    <x-nav-link :href="route('contact.create')" :active="request()->routeIs('contact.create')">
+                    <x-nav-link :href="(auth()->check() && auth()->user()->is_admin) ? route('admin.index') : route('contact.create')" :active="request()->routeIs('contact.create') || request()->routeIs('admin.index')">
                         {{ __('Contacto') }}
                     </x-nav-link>
                     
                     <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.index')">
                         {{ __('Servicios') }}
                     </x-nav-link>
+                    
                 </div>
             </div>
 
@@ -95,21 +96,36 @@
             </x-responsive-nav-link>
 
             @auth
-                <x-responsive-nav-link :href="route('user.bookings.index')" :active="request()->routeIs('user.bookings.*')">
+                <x-responsive-nav-link :href="(auth()->user()->is_admin) ? route('admin.bookings.index') : route('user.bookings.index')" :active="request()->routeIs('user.bookings.*') || request()->routeIs('admin.bookings.*')">
                     {{ __('Mis reservas') }}
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('user.translations.index')" :active="request()->routeIs('user.translations.*')">
+                <x-responsive-nav-link :href="(auth()->user()->is_admin) ? route('admin.translations.index') : route('user.translations.index')" :active="request()->routeIs('user.translations.*') || request()->routeIs('admin.translations.*')">
                     {{ __('Mis traducciones') }}
                 </x-responsive-nav-link>
             @endauth
 
-            <x-responsive-nav-link :href="route('contact.create')" :active="request()->routeIs('contact.create')">
+            <x-responsive-nav-link :href="(auth()->check() && auth()->user()->is_admin) ? route('admin.index') : route('contact.create')" :active="request()->routeIs('contact.create') || request()->routeIs('admin.index')">
                 {{ __('Contacto') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('services.index')" :active="request()->routeIs('services.index')">
                 {{ __('Servicios') }}
             </x-responsive-nav-link>
+            @auth
+                @if(auth()->user()->is_admin)
+                    <x-responsive-nav-link :href="route('admin.availability.index')" :active="request()->routeIs('admin.availability.*')">
+                        {{ __('Disponibilidad') }}
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.bookings.index')" :active="request()->routeIs('admin.bookings.*')">
+                        {{ __('Reservas (admin)') }}
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.translations.index')" :active="request()->routeIs('admin.translations.*')">
+                        {{ __('Traducciones (admin)') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endauth
         </div>
 
         <!-- Responsive Settings Options -->
