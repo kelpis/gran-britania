@@ -1,0 +1,139 @@
+// Diagrama ER simplificado: entidades (cuadrados), relaciones (rombos), atributos (óvalos)
+digraph ER {
+  graph [splines=true rankdir=LR];
+  node [fontname="Arial"];
+
+  // Entidades (rectángulos)
+  User [shape=box, style=filled, fillcolor="#f8f9fa", label="User"];
+  ClassBooking [shape=box, style=filled, fillcolor="#f8f9fa", label="ClassBooking"];
+  AvailabilitySlot [shape=box, style=filled, fillcolor="#f8f9fa", label="AvailabilitySlot"];
+  TranslationRequest [shape=box, style=filled, fillcolor="#f8f9fa", label="TranslationRequest"];
+  ContactMessage [shape=box, style=filled, fillcolor="#f8f9fa", label="ContactMessage"];
+  Service [shape=box, style=filled, fillcolor="#f8f9fa", label="Service"];
+
+  // Relaciones (rombos)
+  Makes [shape=diamond, label="makes"];
+  AssignedToSlot [shape=diamond, label="assigned_to_slot"];
+  SubmittedBy_Email [shape=diamond, label="submitted_by (email)", style=dashed];
+
+  // Atributos (óvalos) - User
+  uid [shape=oval, label="id (PK)"];
+  uname [shape=oval, label="name"];
+  uemail [shape=oval, label="email"];
+  upassword [shape=oval, label="password"];
+  uverified [shape=oval, label="email_verified_at"];
+  uisadmin [shape=oval, label="is_admin"];
+
+  // Atributos - ClassBooking
+  cb_id [shape=oval, label="id (PK)"];
+  cb_date [shape=oval, label="class_date"];
+  cb_time [shape=oval, label="class_time"];
+  cb_name [shape=oval, label="name"];
+  cb_email [shape=oval, label="email"];
+  cb_phone [shape=oval, label="phone"];
+  cb_notes [shape=oval, label="notes"];
+  cb_status [shape=oval, label="status"];
+  cb_meeting [shape=oval, label="meeting_url"];
+  cb_gdpr [shape=oval, label="gdpr_given / gdpr_at"];
+
+  // Atributos - AvailabilitySlot
+  slot_id [shape=oval, label="id (PK)"];
+  slot_date [shape=oval, label="date"];
+  slot_start [shape=oval, label="start_time"];
+  slot_end [shape=oval, label="end_time"];
+  slot_status [shape=oval, label="status"];
+
+  // Atributos - TranslationRequest
+  tr_id [shape=oval, label="id (PK)"];
+  tr_name [shape=oval, label="name"];
+  tr_email [shape=oval, label="email"];
+  tr_source [shape=oval, label="source_lang"];
+  tr_target [shape=oval, label="target_lang"];
+  tr_urgency [shape=oval, label="urgency"];
+  tr_file [shape=oval, label="file_path"];
+  tr_gdpr [shape=oval, label="gdpr_given / gdpr_at"];
+
+  // Atributos - ContactMessage
+  cm_id [shape=oval, label="id (PK)"];
+  cm_name [shape=oval, label="name"];
+  cm_email [shape=oval, label="email"];
+  cm_subject [shape=oval, label="subject"];
+  cm_message [shape=oval, label="message"];
+  cm_gdpr [shape=oval, label="gdpr_given / gdpr_at"];
+
+  // Atributos - Service (placeholder)
+  s_id [shape=oval, label="id (PK)"];
+  s_name [shape=oval, label="name"];
+  s_type [shape=oval, label="type"];
+  s_desc [shape=oval, label="description"];
+
+  // Conectar atributos a entidades (sin flechas)
+  User -> uid [arrowhead=none];
+  User -> uname [arrowhead=none];
+  User -> uemail [arrowhead=none];
+  User -> upassword [arrowhead=none];
+  User -> uverified [arrowhead=none];
+  User -> uisadmin [arrowhead=none];
+
+  ClassBooking -> cb_id [arrowhead=none];
+  ClassBooking -> cb_date [arrowhead=none];
+  ClassBooking -> cb_time [arrowhead=none];
+  ClassBooking -> cb_name [arrowhead=none];
+  ClassBooking -> cb_email [arrowhead=none];
+  ClassBooking -> cb_phone [arrowhead=none];
+  ClassBooking -> cb_notes [arrowhead=none];
+  ClassBooking -> cb_status [arrowhead=none];
+  ClassBooking -> cb_meeting [arrowhead=none];
+  ClassBooking -> cb_gdpr [arrowhead=none];
+
+  AvailabilitySlot -> slot_id [arrowhead=none];
+  AvailabilitySlot -> slot_date [arrowhead=none];
+  AvailabilitySlot -> slot_start [arrowhead=none];
+  AvailabilitySlot -> slot_end [arrowhead=none];
+  AvailabilitySlot -> slot_status [arrowhead=none];
+
+  TranslationRequest -> tr_id [arrowhead=none];
+  TranslationRequest -> tr_name [arrowhead=none];
+  TranslationRequest -> tr_email [arrowhead=none];
+  TranslationRequest -> tr_source [arrowhead=none];
+  TranslationRequest -> tr_target [arrowhead=none];
+  TranslationRequest -> tr_urgency [arrowhead=none];
+  TranslationRequest -> tr_file [arrowhead=none];
+  TranslationRequest -> tr_gdpr [arrowhead=none];
+
+  ContactMessage -> cm_id [arrowhead=none];
+  ContactMessage -> cm_name [arrowhead=none];
+  ContactMessage -> cm_email [arrowhead=none];
+  ContactMessage -> cm_subject [arrowhead=none];
+  ContactMessage -> cm_message [arrowhead=none];
+  ContactMessage -> cm_gdpr [arrowhead=none];
+
+  Service -> s_id [arrowhead=none];
+  Service -> s_name [arrowhead=none];
+  Service -> s_type [arrowhead=none];
+  Service -> s_desc [arrowhead=none];
+
+  // Relaciones entre entidades
+  // User (1) --- (M) ClassBooking via rombo 'Makes'
+  User -> Makes [arrowhead=none];
+  Makes -> ClassBooking [arrowhead=none];
+
+  // AvailabilitySlot (1) --- (M) ClassBooking via rombo 'AssignedToSlot'
+  AvailabilitySlot -> AssignedToSlot [arrowhead=none];
+  AssignedToSlot -> ClassBooking [arrowhead=none];
+
+  // Relación implícita por email (dashed): TranslationRequest / ContactMessage submitted_by email -> User
+  TranslationRequest -> SubmittedBy_Email [arrowhead=none, style=dashed];
+  SubmittedBy_Email -> User [arrowhead=none, style=dashed];
+
+  ContactMessage -> SubmittedBy_Email [arrowhead=none, style=dashed];
+  // Service no tiene relaciones persistentes (placeholder)
+
+  // Estética: agrupar atributos cerca de las entidades
+  { rank = same; User uid uname uemail }
+  { rank = same; ClassBooking cb_id cb_date cb_time }
+  { rank = same; AvailabilitySlot slot_id slot_date }
+  { rank = same; TranslationRequest tr_id tr_name }
+  { rank = same; ContactMessage cm_id cm_name }
+  { rank = same; Service s_id s_name }
+}

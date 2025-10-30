@@ -1,0 +1,126 @@
+%% Diagrama ER (Mermaid) - entidades (rectángulos), relaciones (rombos), atributos (óvalos)
+graph LR
+  %% Entidades
+  User[User]
+  ClassBooking[ClassBooking]
+  AvailabilitySlot[AvailabilitySlot]
+  TranslationRequest[TranslationRequest]
+  ContactMessage[ContactMessage]
+  Service[Service]
+
+  %% Relaciones (rombos)
+  Makes{makes}
+  AssignedToSlot{assigned_to_slot}
+  SubmittedBy_TR{submitted_by (email)}
+  SubmittedBy_CM{submitted_by (email)}
+
+  %% Atributos - User (óvalos)
+  User_id((id))
+  User_name((name))
+  User_email((email))
+  User_password((password))
+  User_verified((email_verified_at))
+  User_is_admin((is_admin))
+
+  User --> User_id
+  User --> User_name
+  User --> User_email
+  User --> User_password
+  User --> User_verified
+  User --> User_is_admin
+
+  %% Atributos - ClassBooking
+  CB_id((id))
+  CB_date((class_date))
+  CB_time((class_time))
+  CB_name((name))
+  CB_email((email))
+  CB_phone((phone))
+  CB_notes((notes))
+  CB_status((status))
+  CB_meeting((meeting_url))
+  CB_gdpr((gdpr_given / gdpr_at))
+
+  ClassBooking --> CB_id
+  ClassBooking --> CB_date
+  ClassBooking --> CB_time
+  ClassBooking --> CB_name
+  ClassBooking --> CB_email
+  ClassBooking --> CB_phone
+  ClassBooking --> CB_notes
+  ClassBooking --> CB_status
+  ClassBooking --> CB_meeting
+  ClassBooking --> CB_gdpr
+
+  %% Atributos - AvailabilitySlot
+  Slot_id((id))
+  Slot_date((date))
+  Slot_start((start_time))
+  Slot_end((end_time))
+  Slot_status((status))
+
+  AvailabilitySlot --> Slot_id
+  AvailabilitySlot --> Slot_date
+  AvailabilitySlot --> Slot_start
+  AvailabilitySlot --> Slot_end
+  AvailabilitySlot --> Slot_status
+
+  %% Atributos - TranslationRequest
+  TR_id((id))
+  TR_name((name))
+  TR_email((email))
+  TR_source((source_lang))
+  TR_target((target_lang))
+  TR_urgency((urgency))
+  TR_file((file_path))
+  TR_gdpr((gdpr_given / gdpr_at))
+
+  TranslationRequest --> TR_id
+  TranslationRequest --> TR_name
+  TranslationRequest --> TR_email
+  TranslationRequest --> TR_source
+  TranslationRequest --> TR_target
+  TranslationRequest --> TR_urgency
+  TranslationRequest --> TR_file
+  TranslationRequest --> TR_gdpr
+
+  %% Atributos - ContactMessage
+  CM_id((id))
+  CM_name((name))
+  CM_email((email))
+  CM_subject((subject))
+  CM_message((message))
+  CM_gdpr((gdpr_given / gdpr_at))
+
+  ContactMessage --> CM_id
+  ContactMessage --> CM_name
+  ContactMessage --> CM_email
+  ContactMessage --> CM_subject
+  ContactMessage --> CM_message
+  ContactMessage --> CM_gdpr
+
+  %% Atributos - Service (placeholder)
+  S_id((id))
+  S_name((name))
+  S_type((type))
+  S_desc((description))
+
+  Service --> S_id
+  Service --> S_name
+  Service --> S_type
+  Service --> S_desc
+
+  %% Relaciones con cardinalidades
+  User -- "1" --> Makes
+  Makes -- "N" --> ClassBooking
+
+  AvailabilitySlot -- "1" --> AssignedToSlot
+  AssignedToSlot -- "N" --> ClassBooking
+
+  TranslationRequest -- "N" --> SubmittedBy_TR
+  SubmittedBy_TR -- "1" --> User
+
+  ContactMessage -- "N" --> SubmittedBy_CM
+  SubmittedBy_CM -- "1" --> User
+
+  %% Nota: TranslationRequest y ContactMessage se asocian por email (relación implícita)
