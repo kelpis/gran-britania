@@ -21,7 +21,7 @@
     @endif
 
     {{-- Formulario de reserva --}}
-    <form method="POST" action="{{ route('bookings.store') }}" class="space-y-5">
+    <form method="POST" action="{{ route('bookings.store') }}" class="space-y-5" data-grecaptcha="v3" data-recaptcha-action="booking">
       @csrf
 
       {{-- Fecha y hora --}}
@@ -99,6 +99,7 @@
       </div>
 
       <div class="text-center">
+        {{-- reCAPTCHA v3: token se inyecta por JS desde layout cuando data-grecaptcha="v3" está presente --}}
         <button type="submit" class="px-5 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700">
           Enviar reserva
         </button>

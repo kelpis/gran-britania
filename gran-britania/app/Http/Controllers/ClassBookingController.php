@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ClassBookingController extends Controller
 {
@@ -161,8 +162,26 @@ class ClassBookingController extends Controller
             }
         }
 
-        $available = array_values(array_filter($all, function ($t) use ($taken, $blockedTimes) {
-            return ! in_array($t, $taken) && ! in_array($t, $blockedTimes);
+        $available = array_values(array_filter($all, function ($t) use ($taken, $blockedTimes, $date) {
+            // Excluir si ya tomado o bloqueado
+            if (in_array($t, $taken) || in_array($t, $blockedTimes)) return false;
+
+            // Si la fecha es hoy, excluir horas que ya hayan pasado respecto a la hora actual
+            try {
+                $d = Carbon::parse($date);
+                if ($d->isToday()) {
+                    [$H, $M] = explode(':', substr($t, 0, 5));
+                    $tMin = intval($H) * 60 + intval($M);
+                    $now = Carbon::now();
+                    $nowMin = $now->hour * 60 + $now->minute;
+                    // Si la franja es anterior o igual al momento actual, no mostrarla
+                    if ($tMin <= $nowMin) return false;
+                }
+            } catch (\Throwable $e) {
+                // si falla el parseo, no hacemos el filtrado por hora
+            }
+
+            return true;
         }));
 
         return response()->json(['available' => $available]);

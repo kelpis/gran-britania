@@ -5,5 +5,10 @@
       Tu solicitud ha sido registrada en estado <strong>pendiente</strong>.
       Recibirás un correo de confirmación en breve.
     </p>
+    <div class="mt-4">
+      <a href="{{ route('dashboard') }}" class="inline-block px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700">
+        Volver al panel
+      </a>
+    </div>
   </div>
 </x-guest-layout>

@@ -17,11 +17,12 @@ class BookingAdminController extends Controller
         $pendientes = ClassBooking::where('status','pending')
             ->orderBy('class_date')->orderBy('class_time')->get();
 
+        // Order all lists by class_date then class_time (ascending)
         $confirmadas = ClassBooking::where('status','confirmed')
-            ->orderByDesc('updated_at')->limit(50)->get();
+            ->orderBy('class_date')->orderBy('class_time')->limit(50)->get();
 
         $canceladas = ClassBooking::where('status','cancelled')
-            ->orderByDesc('updated_at')->limit(50)->get();
+            ->orderBy('class_date')->orderBy('class_time')->limit(50)->get();
 
         return view('admin.booking', compact('pendientes','confirmadas','canceladas'));
 

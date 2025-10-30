@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\Recaptcha;
 
 class StoreContactRequest extends FormRequest
 {
@@ -27,8 +28,9 @@ class StoreContactRequest extends FormRequest
             'subject' => 'nullable|string|max:160',
             'message' => 'required|string|max:2000',
             'gdpr'    => 'accepted',
-            // Si luego añades reCAPTCHA:
-            // 'g-recaptcha-response' => 'required|recaptcha'
+            // reCAPTCHA v2 field (Google) - validated via App\Rules\Recaptcha
+            // validate reCAPTCHA v3 with a conservative threshold (0.5) and expected action 'contact'
+            'g-recaptcha-response' => ['required', new Recaptcha(0.5, 'contact')],
         ];
     }
 

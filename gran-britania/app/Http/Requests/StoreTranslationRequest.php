@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\Recaptcha;
 
 class StoreTranslationRequest extends FormRequest
 {
@@ -30,6 +31,8 @@ class StoreTranslationRequest extends FormRequest
             'file' => 'required|file|max:5120', // 5MB
             'comments' => 'nullable|string|max:2000',
             'gdpr' => 'accepted',
+            // validate reCAPTCHA v3 with a conservative threshold (0.5) and expected action 'translation'
+            'g-recaptcha-response' => ['required', new Recaptcha(0.5, 'translation')],
         ];
     }
 }

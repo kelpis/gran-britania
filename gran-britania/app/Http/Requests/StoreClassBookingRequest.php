@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\Recaptcha;
 use Illuminate\Validation\Rule;
 use App\Models\ClassBooking;
 use Illuminate\Contracts\Validation\Validator;
@@ -25,13 +26,19 @@ class StoreClassBookingRequest extends FormRequest
             'phone'      => ['nullable', 'string', 'max:40'],
             'notes'      => ['nullable', 'string', 'max:255'],
             'gdpr'       => ['accepted'],
+            // validate reCAPTCHA v3 with a conservative threshold (0.5) and expected action 'booking'
+            'g-recaptcha-response' => ['required', new Recaptcha(0.5, 'booking')],
         ];
     }
 
     protected function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
-            $data = $this->only(['class_date', 'class_time']);
+            $allData = $validator->getData();
+            $data = [
+                'class_date' => $allData['class_date'] ?? null,
+                'class_time' => $allData['class_time'] ?? null,
+            ];
 
             if (empty($data['class_date']) || empty($data['class_time'])) {
                 return;

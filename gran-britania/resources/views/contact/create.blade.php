@@ -18,7 +18,7 @@
       @endif
 
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-        <form method="POST" action="{{ route('contact.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('contact.store') }}" class="space-y-4" data-grecaptcha="v3" data-recaptcha-action="contact">
           @csrf
 
           <div>
@@ -47,6 +47,8 @@
               <span class="ml-2">He leído y acepto la <a href="{{ route('privacy') }}" class="text-blue-600 underline">política de protección de datos</a>.</span>
             </label>
           </div>
+
+          {{-- reCAPTCHA v3: token se inyecta por JS desde layout cuando data-grecaptcha="v3" está presente --}}
 
           <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Enviar</button>
         </form>

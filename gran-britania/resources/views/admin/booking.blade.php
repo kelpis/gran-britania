@@ -4,6 +4,7 @@
     </x-slot>
 
     <div class="py-6 space-y-6 max-w-6xl mx-auto">
+        {{-- Collections are ordered in the controller for performance and separation of concerns. --}}
         {{-- Mensajes de estado --}}
         @if (session('ok'))
             <div class="p-3 rounded bg-green-50 border border-green-200 text-green-800">
